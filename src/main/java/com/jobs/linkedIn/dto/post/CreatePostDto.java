@@ -12,11 +12,7 @@ public class CreatePostDto {
     @Size(min =  5, max = 100)
     private String title;
 
-    @NotNull
-    @Positive
-    private long postedBy;
-
     @NotEmpty
-    @Size(min =  10, max = 255)
+    @Size(min =  10)
     private String description;
 }

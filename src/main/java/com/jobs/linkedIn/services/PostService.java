@@ -6,7 +6,7 @@ import com.jobs.linkedIn.dto.post.PostDto;
 import java.util.List;
 
 public interface PostService {
-    PostDto createPost(CreatePostDto createPostDto);
+    PostDto createPost(CreatePostDto createPostDto, String token);
     PostDto getPostById(long id);
     List<PostDto> getAllPosts();
     String deletePostById(long id, String token);

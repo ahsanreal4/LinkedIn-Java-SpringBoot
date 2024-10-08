@@ -13,5 +13,7 @@ public class PostDto {
     private String title;
     private String description;
     private Date postedAt;
+    private Integer numComments;
+    private Integer numLikes;
     private List<PostCommentDto> comments;
 }

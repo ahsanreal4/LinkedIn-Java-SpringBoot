@@ -33,8 +33,10 @@ public class PostController {
     }
 
     @PostMapping("")
-    public ResponseEntity<PostDto> createPost(@Valid @RequestBody CreatePostDto createPostDto) {
-        PostDto createdPost = this.postService.createPost(createPostDto);
+    public ResponseEntity<PostDto> createPost(@Valid @RequestBody CreatePostDto createPostDto, HttpServletRequest request) {
+        String token = new HeaderUtils().getTokenFromHeader(request);
+
+        PostDto createdPost = this.postService.createPost(createPostDto, token);
 
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
@@ -47,14 +49,14 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> getPostById(@RequestParam("id") long id) {
+    public ResponseEntity<PostDto> getPostById(@PathVariable("id") long id) {
         PostDto post = this.postService.getPostById(id);
 
         return ResponseEntity.ok(post);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePostById(@RequestParam("id") long id, HttpServletRequest request) {
+    public ResponseEntity<String> deletePostById(@PathVariable("id") long id, HttpServletRequest request) {
         String token = new HeaderUtils().getTokenFromHeader(request);
 
         String response = this.postService.deletePostById(id, token);

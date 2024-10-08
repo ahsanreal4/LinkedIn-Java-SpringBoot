@@ -38,11 +38,13 @@ class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto) {
+    public PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto, String token) {
+        String email = jwtTokenProvider.getEmail(token);
+
         Post post = postRepository.findById(createPostCommentDto.getPostId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
 
-        User user = userRepository.findById(createPostCommentDto.getUserId())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
 
         PostComment postComment = new PostComment();

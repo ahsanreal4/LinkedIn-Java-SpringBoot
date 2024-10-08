@@ -28,7 +28,7 @@ public class PostComment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private PostComment parent;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
 
     @Column(nullable = false)

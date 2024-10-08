@@ -31,35 +31,38 @@ public class CommentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<PostCommentDto> addCommentToPost(@Valid @RequestBody CreatePostCommentDto createPostCommentDto) {
-        PostCommentDto postCommentDto = this.commentService.addPostComment(createPostCommentDto);
+    public ResponseEntity<PostCommentDto> addCommentToPost(@Valid @RequestBody CreatePostCommentDto createPostCommentDto,
+                                                           HttpServletRequest request) {
+        String token = new HeaderUtils().getTokenFromHeader(request);
+
+        PostCommentDto postCommentDto = this.commentService.addPostComment(createPostCommentDto, token);
 
         return new ResponseEntity<>(postCommentDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostCommentDto> getCommentById(@RequestParam("id") long id) {
+    public ResponseEntity<PostCommentDto> getCommentById(@PathVariable("id") long id) {
         PostCommentDto postCommentDto = this.commentService.getCommentById(id);
 
         return ResponseEntity.ok(postCommentDto);
     }
 
     @GetMapping("/replies/{id}")
-    public ResponseEntity<List<PostCommentDto>> getReplyComments(@RequestParam("id") long id) {
+    public ResponseEntity<List<PostCommentDto>> getReplyComments(@PathVariable("id") long id) {
         List<PostCommentDto> postCommentDtos = this.commentService.getReplyComments(id);
 
         return ResponseEntity.ok(postCommentDtos);
     }
 
     @GetMapping("/post/{id}")
-    public ResponseEntity<List<PostCommentDto>> getPostComments(@RequestParam("id") long id) {
+    public ResponseEntity<List<PostCommentDto>> getPostComments(@PathVariable("id") long id) {
         List<PostCommentDto> postCommentDtos = this.commentService.getPostComments(id);
 
         return ResponseEntity.ok(postCommentDtos);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCommentById(@RequestParam("id") long id,
+    public ResponseEntity<String> deleteCommentById(@PathVariable("id") long id,
                                                     HttpServletRequest request) {
         String token = new HeaderUtils().getTokenFromHeader(request);
 

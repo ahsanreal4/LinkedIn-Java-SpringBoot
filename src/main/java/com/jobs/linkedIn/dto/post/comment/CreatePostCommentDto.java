@@ -12,10 +12,6 @@ public class CreatePostCommentDto {
     @NotNull
     private Long postId;
 
-    @NotNull
-    @Positive
-    private Long userId;
-
     @Positive
     private Long parentId;
 

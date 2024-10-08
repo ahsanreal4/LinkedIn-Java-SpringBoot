@@ -6,7 +6,7 @@ import com.jobs.linkedIn.dto.post.comment.PostCommentDto;
 import java.util.List;
 
 public interface CommentService {
-    PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto);
+    PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto, String token);
     List<PostCommentDto> getPostComments(long id);
     List<PostCommentDto> getReplyComments(long id);
     PostCommentDto getCommentById(long id);

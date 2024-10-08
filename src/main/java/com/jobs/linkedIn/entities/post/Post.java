@@ -31,12 +31,6 @@ public class Post {
     @Column(nullable = false)
     private Date postedAt;
 
-    @Column()
-    private Integer numLikes = 0;
-
-    @Column()
-    private Integer numComments = 0;
-
     @OneToMany(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,

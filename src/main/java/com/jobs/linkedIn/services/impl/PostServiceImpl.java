@@ -5,11 +5,11 @@ import com.jobs.linkedIn.dto.post.CreatePostDto;
 import com.jobs.linkedIn.dto.post.PostDto;
 import com.jobs.linkedIn.dto.post.comment.PostCommentDto;
 import com.jobs.linkedIn.entities.post.Post;
-import com.jobs.linkedIn.entities.post.PostComment;
 import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
+import com.jobs.linkedIn.services.CommentService;
 import com.jobs.linkedIn.services.PostService;
 import com.jobs.linkedIn.utils.RoleUtils;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,22 +25,26 @@ class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final CommentService commentService;
 
     public PostServiceImpl(PostRepository postRepository, JwtTokenProvider jwtTokenProvider,
-                           UserRepository userRepository) {
+                           UserRepository userRepository, CommentService commentService) {
         this.postRepository = postRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
+        this.commentService = commentService;
     }
 
     @Override
-    public PostDto createPost(CreatePostDto createPostDto) {
+    public PostDto createPost(CreatePostDto createPostDto, String token) {
+        String email = jwtTokenProvider.getEmail(token);
+
         Post post = new Post();
         post.setTitle(createPostDto.getTitle());
         post.setDescription(createPostDto.getDescription());
         post.setPostedAt(new Date());
 
-        User user = userRepository.findById(createPostDto.getPostedBy())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
 
         post.setPostedBy(user);
@@ -56,11 +59,11 @@ class PostServiceImpl implements PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
 
-        Set<PostComment> commentSet = post.getComments();
+        List<PostCommentDto> commentsDto = this.commentService.getPostComments(id);
 
         PostDto postDto = mapToDto(post);
-
-        postDto.setComments(commentSet.stream().map(this::mapToCommentDto).collect(Collectors.toList()));
+        postDto.setNumComments(commentsDto.size());
+        postDto.setComments(commentsDto);
 
         return postDto;
     }
@@ -89,18 +92,6 @@ class PostServiceImpl implements PostService {
         postRepository.delete(post);
 
         return "Post deleted successfully";
-    }
-
-    private PostCommentDto mapToCommentDto(PostComment comment) {
-        PostCommentDto commentDto = new PostCommentDto();
-        commentDto.setId(comment.getId());
-        commentDto.setPostedAt(comment.getPostedAt());
-        commentDto.setPost(comment.getPost().getId());
-        commentDto.setUser(comment.getUser().getId());
-        commentDto.setParent(comment.getParent().getId());
-        commentDto.setText(comment.getText());
-
-        return commentDto;
     }
 
     private PostDto mapToDto(Post post) {
