@@ -36,7 +36,7 @@ public class UserInfo {
     @Column
     private String website;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String professionalSummary;
 
     @Column()
