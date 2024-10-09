@@ -1,6 +1,5 @@
 package com.jobs.linkedIn.services.impl;
 
-import com.jobs.linkedIn.config.security.JwtTokenProvider;
 import com.jobs.linkedIn.dto.user.UpdateUserDto;
 import com.jobs.linkedIn.dto.user.UserDto;
 import com.jobs.linkedIn.dto.user.UserProfileDto;
@@ -8,6 +7,7 @@ import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.user.UserRepository;
 import com.jobs.linkedIn.services.UserService;
+import com.jobs.linkedIn.utils.UserUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,14 +21,12 @@ class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper,
-                           JwtTokenProvider jwtTokenProvider,PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
-        this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -50,8 +48,8 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UpdateUserDto updateUserDto, String token) {
-        String email = jwtTokenProvider.getEmail(token);
+    public UserDto updateUser(UpdateUserDto updateUserDto) {
+        String email = new UserUtils().getEmail();
 
         User user = userRepository.findByEmail(email).
                 orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
@@ -81,8 +79,8 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileDto getProfile(String token) {
-        String email = jwtTokenProvider.getEmail(token);
+    public UserProfileDto getProfile() {
+        String email = new UserUtils().getEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
@@ -94,8 +92,8 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getUserFriends(String token) {
-        String email = jwtTokenProvider.getEmail(token);
+    public List<UserDto> getUserFriends() {
+        String email = new UserUtils().getEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));

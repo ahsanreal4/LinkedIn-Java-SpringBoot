@@ -2,9 +2,11 @@ package com.jobs.linkedIn.entities.post;
 
 import com.jobs.linkedIn.entities.user.User;
 import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+@Data
 @Entity
 @Table(
         uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"})

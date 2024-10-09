@@ -2,11 +2,13 @@ package com.jobs.linkedIn.utils;
 
 import com.jobs.linkedIn.constants.UserRoles;
 import com.jobs.linkedIn.entities.user.Role;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Set;
 
-public class RoleUtils {
+public class UserUtils {
     public boolean isAdmin(Set<Role> roles){
         String adminRole = UserRoles.ROLE_INDEX + UserRoles.ADMIN;
 
@@ -17,5 +19,11 @@ public class RoleUtils {
         }
 
         return false;
+    }
+
+    public String getEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return authentication.getName();
     }
 }

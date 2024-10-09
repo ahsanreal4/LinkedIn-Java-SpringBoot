@@ -7,5 +7,6 @@ import java.util.Set;
 
 public interface PostCommentsRepository extends JpaRepository<PostComment, Long> {
     Set<PostComment> findByPostIdAndParentId(long postId, Long parentId);
+    int countByPostId(long postId);
     Set<PostComment> findByParentId(long id);
 }

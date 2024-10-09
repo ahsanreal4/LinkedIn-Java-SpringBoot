@@ -11,9 +11,9 @@ public interface UserService {
 
     String deleteUser(long id);
 
-    UserDto updateUser(UpdateUserDto updateUserDto, String token);
+    UserDto updateUser(UpdateUserDto updateUserDto);
 
-    UserProfileDto getProfile(String token);
+    UserProfileDto getProfile();
 
-    List<UserDto> getUserFriends(String token);
+    List<UserDto> getUserFriends();
 }

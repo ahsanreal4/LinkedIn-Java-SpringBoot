@@ -37,4 +37,12 @@ public class Post {
             mappedBy = "post"
     )
     private Set<PostComment> comments = new HashSet<>();
+
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "post"
+    )
+    private Set<PostLikes> likes = new HashSet<>();
+
 }

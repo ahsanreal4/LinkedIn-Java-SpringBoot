@@ -2,8 +2,7 @@ package com.jobs.linkedIn.controllers.post;
 
 import com.jobs.linkedIn.dto.post.comment.CreatePostCommentDto;
 import com.jobs.linkedIn.dto.post.comment.PostCommentDto;
-import com.jobs.linkedIn.services.CommentService;
-import com.jobs.linkedIn.utils.HeaderUtils;
+import com.jobs.linkedIn.services.post.CommentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/api/posts/comments")
 @SecurityRequirement(
         name = "Bear Authentication"
 )
@@ -31,11 +30,8 @@ public class CommentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<PostCommentDto> addCommentToPost(@Valid @RequestBody CreatePostCommentDto createPostCommentDto,
-                                                           HttpServletRequest request) {
-        String token = new HeaderUtils().getTokenFromHeader(request);
-
-        PostCommentDto postCommentDto = this.commentService.addPostComment(createPostCommentDto, token);
+    public ResponseEntity<PostCommentDto> addCommentToPost(@Valid @RequestBody CreatePostCommentDto createPostCommentDto) {
+        PostCommentDto postCommentDto = this.commentService.addPostComment(createPostCommentDto);
 
         return new ResponseEntity<>(postCommentDto, HttpStatus.CREATED);
     }
@@ -62,11 +58,8 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCommentById(@PathVariable("id") long id,
-                                                    HttpServletRequest request) {
-        String token = new HeaderUtils().getTokenFromHeader(request);
-
-        String response = this.commentService.deleteCommentById(id, token);
+    public ResponseEntity<String> deleteCommentById(@PathVariable("id") long id) {
+        String response = this.commentService.deleteCommentById(id);
 
         return ResponseEntity.ok(response);
     }

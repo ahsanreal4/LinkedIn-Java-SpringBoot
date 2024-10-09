@@ -2,12 +2,9 @@ package com.jobs.linkedIn.controllers.post;
 
 import com.jobs.linkedIn.dto.post.CreatePostDto;
 import com.jobs.linkedIn.dto.post.PostDto;
-import com.jobs.linkedIn.exception.ApiException;
-import com.jobs.linkedIn.services.PostService;
-import com.jobs.linkedIn.utils.HeaderUtils;
+import com.jobs.linkedIn.services.post.PostService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +30,8 @@ public class PostController {
     }
 
     @PostMapping("")
-    public ResponseEntity<PostDto> createPost(@Valid @RequestBody CreatePostDto createPostDto, HttpServletRequest request) {
-        String token = new HeaderUtils().getTokenFromHeader(request);
-
-        PostDto createdPost = this.postService.createPost(createPostDto, token);
+    public ResponseEntity<PostDto> createPost(@Valid @RequestBody CreatePostDto createPostDto) {
+        PostDto createdPost = this.postService.createPost(createPostDto);
 
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
@@ -56,10 +51,8 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePostById(@PathVariable("id") long id, HttpServletRequest request) {
-        String token = new HeaderUtils().getTokenFromHeader(request);
-
-        String response = this.postService.deletePostById(id, token);
+    public ResponseEntity<String> deletePostById(@PathVariable("id") long id) {
+        String response = this.postService.deletePostById(id);
 
         return ResponseEntity.ok(response);
     }

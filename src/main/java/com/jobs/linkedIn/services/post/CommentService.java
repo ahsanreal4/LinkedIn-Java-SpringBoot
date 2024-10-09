@@ -1,4 +1,4 @@
-package com.jobs.linkedIn.services;
+package com.jobs.linkedIn.services.post;
 
 import com.jobs.linkedIn.dto.post.comment.CreatePostCommentDto;
 import com.jobs.linkedIn.dto.post.comment.PostCommentDto;
@@ -6,9 +6,10 @@ import com.jobs.linkedIn.dto.post.comment.PostCommentDto;
 import java.util.List;
 
 public interface CommentService {
-    PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto, String token);
+    PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto);
     List<PostCommentDto> getPostComments(long id);
+    int getNumberOfPostComments(long id);
     List<PostCommentDto> getReplyComments(long id);
     PostCommentDto getCommentById(long id);
-    String deleteCommentById(long id, String token);
+    String deleteCommentById(long id);
 }

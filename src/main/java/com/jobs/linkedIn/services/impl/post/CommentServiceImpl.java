@@ -1,6 +1,5 @@
-package com.jobs.linkedIn.services.impl;
+package com.jobs.linkedIn.services.impl.post;
 
-import com.jobs.linkedIn.config.security.JwtTokenProvider;
 import com.jobs.linkedIn.dto.post.comment.CreatePostCommentDto;
 import com.jobs.linkedIn.dto.post.comment.PostCommentDto;
 import com.jobs.linkedIn.entities.post.Post;
@@ -10,8 +9,8 @@ import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostCommentsRepository;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.CommentService;
-import com.jobs.linkedIn.utils.RoleUtils;
+import com.jobs.linkedIn.services.post.CommentService;
+import com.jobs.linkedIn.utils.UserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -25,21 +24,18 @@ class CommentServiceImpl implements CommentService {
     private final PostCommentsRepository postCommentsRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
     public CommentServiceImpl(PostCommentsRepository postCommentsRepository,
                               UserRepository userRepository,
-                              PostRepository postRepository,
-                              JwtTokenProvider jwtTokenProvider) {
+                              PostRepository postRepository) {
         this.postCommentsRepository = postCommentsRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
-    public PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto, String token) {
-        String email = jwtTokenProvider.getEmail(token);
+    public PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto) {
+        String email = new UserUtils().getEmail();
 
         Post post = postRepository.findById(createPostCommentDto.getPostId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
@@ -75,6 +71,11 @@ class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public int getNumberOfPostComments(long id) {
+        return postCommentsRepository.countByPostId(id);
+    }
+
+    @Override
     public List<PostCommentDto> getReplyComments(long id) {
         Set<PostComment> comments = postCommentsRepository.findByParentId(id);
 
@@ -90,8 +91,8 @@ class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public String deleteCommentById(long id, String token) {
-        String email = jwtTokenProvider.getEmail(token);
+    public String deleteCommentById(long id) {
+        String email = new UserUtils().getEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
@@ -99,7 +100,7 @@ class CommentServiceImpl implements CommentService {
         PostComment postComment = postCommentsRepository.findById(id)
                 .orElseThrow(() -> new ApiException((HttpStatus.NOT_FOUND), "post comment does not exist"));
 
-        boolean isAdmin = new RoleUtils().isAdmin(user.getRoles());
+        boolean isAdmin = new UserUtils().isAdmin(user.getRoles());
 
         if (!isAdmin && !postComment.getUser().getId().equals(user.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, "you cannot delete someone else comment");
 

@@ -4,12 +4,9 @@ import com.jobs.linkedIn.constants.UserRoles;
 import com.jobs.linkedIn.dto.user.UpdateUserDto;
 import com.jobs.linkedIn.dto.user.UserDto;
 import com.jobs.linkedIn.dto.user.UserProfileDto;
-import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.services.UserService;
-import com.jobs.linkedIn.utils.HeaderUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,34 +50,22 @@ public class UserController {
     }
 
     @PutMapping("")
-    public ResponseEntity<UserDto> updateUser(HttpServletRequest request, @Valid @RequestBody UpdateUserDto updateUserDto) {
-        String token = new HeaderUtils().getTokenFromHeader(request);
-
-        if (token == null) throw new ApiException(HttpStatus.BAD_REQUEST, "jwt token invalid or not found");
-
-        UserDto userDto = this.userService.updateUser(updateUserDto, token);
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UpdateUserDto updateUserDto) {
+        UserDto userDto = this.userService.updateUser(updateUserDto);
 
         return ResponseEntity.ok(userDto);
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserProfileDto> getUserProfile(HttpServletRequest request) {
-        String token = new HeaderUtils().getTokenFromHeader(request);
-
-        if (token == null) throw new ApiException(HttpStatus.BAD_REQUEST, "jwt token invalid or not found");
-
-        UserProfileDto userProfileDto = this.userService.getProfile(token);
+    public ResponseEntity<UserProfileDto> getUserProfile() {
+        UserProfileDto userProfileDto = this.userService.getProfile();
 
         return ResponseEntity.ok(userProfileDto);
     }
 
     @GetMapping("/friends")
-    public ResponseEntity<List<UserDto>> getUserFriends(HttpServletRequest request) {
-        String token = new HeaderUtils().getTokenFromHeader(request);
-
-        if (token == null) throw new ApiException(HttpStatus.BAD_REQUEST, "jwt token invalid or not found");
-
-        List<UserDto> friends = this.userService.getUserFriends(token);
+    public ResponseEntity<List<UserDto>> getUserFriends() {
+        List<UserDto> friends = this.userService.getUserFriends();
 
         return ResponseEntity.ok(friends);
     }

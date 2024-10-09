@@ -15,5 +15,6 @@ public class PostDto {
     private Date postedAt;
     private Integer numComments;
     private Integer numLikes;
+    private boolean isLiked;
     private List<PostCommentDto> comments;
 }

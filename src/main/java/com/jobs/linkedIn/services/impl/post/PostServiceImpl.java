@@ -1,6 +1,5 @@
-package com.jobs.linkedIn.services.impl;
+package com.jobs.linkedIn.services.impl.post;
 
-import com.jobs.linkedIn.config.security.JwtTokenProvider;
 import com.jobs.linkedIn.dto.post.CreatePostDto;
 import com.jobs.linkedIn.dto.post.PostDto;
 import com.jobs.linkedIn.dto.post.comment.PostCommentDto;
@@ -9,9 +8,10 @@ import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.CommentService;
-import com.jobs.linkedIn.services.PostService;
-import com.jobs.linkedIn.utils.RoleUtils;
+import com.jobs.linkedIn.services.post.CommentService;
+import com.jobs.linkedIn.services.post.PostLikeService;
+import com.jobs.linkedIn.services.post.PostService;
+import com.jobs.linkedIn.utils.UserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -23,21 +23,22 @@ import java.util.stream.Collectors;
 class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final CommentService commentService;
+    private final PostLikeService postLikeService;
 
-    public PostServiceImpl(PostRepository postRepository, JwtTokenProvider jwtTokenProvider,
-                           UserRepository userRepository, CommentService commentService) {
+    public PostServiceImpl(PostRepository postRepository,
+                           UserRepository userRepository, CommentService commentService,
+                           PostLikeService postLikeService) {
         this.postRepository = postRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
         this.commentService = commentService;
+        this.postLikeService = postLikeService;
     }
 
     @Override
-    public PostDto createPost(CreatePostDto createPostDto, String token) {
-        String email = jwtTokenProvider.getEmail(token);
+    public PostDto createPost(CreatePostDto createPostDto) {
+        String email = new UserUtils().getEmail();
 
         Post post = new Post();
         post.setTitle(createPostDto.getTitle());
@@ -54,30 +55,52 @@ class PostServiceImpl implements PostService {
         return mapToDto(savedPost);
     }
 
+    private PostDto getPostData(Post post, boolean ignoreFetchingComments) {
+        PostDto postDto = mapToDto(post);
+
+        long id = post.getId();
+
+        if(!ignoreFetchingComments) {
+            List<PostCommentDto> commentsDto = this.commentService.getPostComments(id);
+            postDto.setComments(commentsDto);
+            postDto.setNumComments(commentsDto.size());
+        }
+        else {
+            int numComments = this.commentService.getNumberOfPostComments(id);
+            postDto.setNumComments(numComments);
+        }
+
+        int numLikes = this.postLikeService.getNumberOfPostLikes(id);
+
+        boolean isLiked = false;
+
+        // Only check if likes on post are greater than 0
+        if(numLikes > 0) isLiked = this.postLikeService.isLikedByUser(id);
+
+        postDto.setNumLikes(numLikes);
+        postDto.setLiked(isLiked);
+
+        return postDto;
+    }
+
     @Override
     public PostDto getPostById(long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
 
-        List<PostCommentDto> commentsDto = this.commentService.getPostComments(id);
-
-        PostDto postDto = mapToDto(post);
-        postDto.setNumComments(commentsDto.size());
-        postDto.setComments(commentsDto);
-
-        return postDto;
+        return getPostData(post, false);
     }
 
     @Override
     public List<PostDto> getAllPosts() {
         List<Post> posts = postRepository.findAll();
 
-        return posts.stream().map(this::mapToDto).collect(Collectors.toList());
+        return posts.stream().map(post -> getPostData(post, true)).collect(Collectors.toList());
     }
 
     @Override
-    public String deletePostById(long id, String token) {
-        String email = jwtTokenProvider.getEmail(token);
+    public String deletePostById(long id) {
+        String email = new UserUtils().getEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
@@ -85,7 +108,7 @@ class PostServiceImpl implements PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
 
-        boolean isAdmin = new RoleUtils().isAdmin(user.getRoles());
+        boolean isAdmin = new UserUtils().isAdmin(user.getRoles());
 
         if (!isAdmin && !post.getPostedBy().getId().equals(user.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, "you cannot delete someone else post");
 
