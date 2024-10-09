@@ -10,7 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 )
 public class CompanyLocations {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false)

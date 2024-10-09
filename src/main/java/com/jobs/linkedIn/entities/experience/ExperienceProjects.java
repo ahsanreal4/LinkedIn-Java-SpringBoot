@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Table
 public class ExperienceProjects {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

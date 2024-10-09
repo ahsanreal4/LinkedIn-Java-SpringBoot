@@ -13,7 +13,7 @@ import java.util.Date;
 @Table
 public class PostComment {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne()

@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Table
 public class Experience {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false)

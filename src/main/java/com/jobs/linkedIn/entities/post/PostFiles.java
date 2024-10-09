@@ -20,7 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
 )
 public class PostFiles {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false)
