@@ -14,20 +14,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final UserUtils userUtils;
 
     public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder, UserUtils userUtils) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
+        this.userUtils = userUtils;
     }
 
     @Override
@@ -49,10 +52,13 @@ class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UpdateUserDto updateUserDto) {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
-        User user = userRepository.findByEmail(email).
-                orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
 
         if (updateUserDto.getUsername() != null && !updateUserDto.getUsername().equals(user.getUsername())) {
             String username = updateUserDto.getUsername();
@@ -80,10 +86,13 @@ class UserServiceImpl implements UserService {
 
     @Override
     public UserProfileDto getProfile() {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
 
         UserProfileDto userProfileDto = modelMapper.map(user, UserProfileDto.class);
         if(user.getUserInfo() != null) modelMapper.map(user.getUserInfo(), userProfileDto);
@@ -93,10 +102,13 @@ class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUserFriends() {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
 
         List<User> friends = user.getFriends().stream().toList();
 

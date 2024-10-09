@@ -19,23 +19,25 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl implements CommentService {
 
     private final PostCommentsRepository postCommentsRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final UserUtils userUtils;
 
     public CommentServiceImpl(PostCommentsRepository postCommentsRepository,
                               UserRepository userRepository,
-                              PostRepository postRepository) {
+                              PostRepository postRepository, UserUtils userUtils) {
         this.postCommentsRepository = postCommentsRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
+        this.userUtils = userUtils;
     }
 
     @Override
     public PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto) {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
         Post post = postRepository.findById(createPostCommentDto.getPostId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
@@ -92,7 +94,7 @@ class CommentServiceImpl implements CommentService {
 
     @Override
     public String deleteCommentById(long id) {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
@@ -100,7 +102,7 @@ class CommentServiceImpl implements CommentService {
         PostComment postComment = postCommentsRepository.findById(id)
                 .orElseThrow(() -> new ApiException((HttpStatus.NOT_FOUND), "post comment does not exist"));
 
-        boolean isAdmin = new UserUtils().isAdmin(user.getRoles());
+        boolean isAdmin = userUtils.isAdmin(user.getRoles());
 
         if (!isAdmin && !postComment.getUser().getId().equals(user.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, "you cannot delete someone else comment");
 

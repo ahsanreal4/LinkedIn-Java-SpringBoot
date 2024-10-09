@@ -20,25 +20,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-class PostServiceImpl implements PostService {
+public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentService commentService;
     private final PostLikeService postLikeService;
+    private final UserUtils userUtils;
 
     public PostServiceImpl(PostRepository postRepository,
                            UserRepository userRepository, CommentService commentService,
-                           PostLikeService postLikeService) {
+                           PostLikeService postLikeService, UserUtils userUtils) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentService = commentService;
         this.postLikeService = postLikeService;
+        this.userUtils = userUtils;
     }
 
     @Override
     public PostDto createPost(CreatePostDto createPostDto) {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
         Post post = new Post();
         post.setTitle(createPostDto.getTitle());
@@ -100,7 +102,7 @@ class PostServiceImpl implements PostService {
 
     @Override
     public String deletePostById(long id) {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
@@ -108,7 +110,7 @@ class PostServiceImpl implements PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
 
-        boolean isAdmin = new UserUtils().isAdmin(user.getRoles());
+        boolean isAdmin = userUtils.isAdmin(user.getRoles());
 
         if (!isAdmin && !post.getPostedBy().getId().equals(user.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, "you cannot delete someone else post");
 

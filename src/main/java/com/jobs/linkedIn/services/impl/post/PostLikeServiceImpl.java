@@ -16,23 +16,25 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-class PostLikeServiceImpl implements PostLikeService {
+public class PostLikeServiceImpl implements PostLikeService {
 
     private final PostLikesRepository postLikesRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final UserUtils userUtils;
 
     public PostLikeServiceImpl(PostLikesRepository postLikesRepository,
                                UserRepository userRepository,
-                               PostRepository postRepository) {
+                               PostRepository postRepository, UserUtils userUtils) {
         this.postLikesRepository = postLikesRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
+        this.userUtils = userUtils;
     }
 
     @Override
     public String likePost(long postId) {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
@@ -68,7 +70,7 @@ class PostLikeServiceImpl implements PostLikeService {
 
     @Override
     public boolean isLikedByUser(long postId) {
-        String email = new UserUtils().getEmail();
+        String email = userUtils.getEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));

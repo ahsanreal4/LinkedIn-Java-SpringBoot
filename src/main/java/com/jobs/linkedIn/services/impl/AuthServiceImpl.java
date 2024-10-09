@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
