@@ -216,5 +216,6 @@ public class UserServiceTest {
 
         Assertions.assertThrows(ApiException.class, () -> {
             this.userService.getUserFriends();
-        });    }
+        });
+    }
 }

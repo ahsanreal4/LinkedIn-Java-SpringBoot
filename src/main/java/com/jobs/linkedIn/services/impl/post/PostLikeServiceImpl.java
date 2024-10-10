@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostLikeServiceImpl implements PostLikeService {
@@ -36,11 +37,17 @@ public class PostLikeServiceImpl implements PostLikeService {
     public String likePost(long postId) {
         String email = userUtils.getEmail();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
+        if (optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
+
+        Optional<Post> optionalPost = postRepository.findById(postId);
+
+        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "post does not exist");
+
+        Post post = optionalPost.get();
 
         PostLikes prevPostLikes = postLikesRepository.findByUserIdAndPostId(user.getId(), postId);
 
@@ -72,8 +79,11 @@ public class PostLikeServiceImpl implements PostLikeService {
     public boolean isLikedByUser(long postId) {
         String email = userUtils.getEmail();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
 
         return postLikesRepository.existsByUserIdAndPostId(user.getId(), postId);
     }

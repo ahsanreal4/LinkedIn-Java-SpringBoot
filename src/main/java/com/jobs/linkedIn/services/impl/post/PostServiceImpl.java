@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,8 +48,11 @@ public class PostServiceImpl implements PostService {
         post.setDescription(createPostDto.getDescription());
         post.setPostedAt(new Date());
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
 
         post.setPostedBy(user);
 
@@ -87,8 +91,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto getPostById(long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if(optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "post does not exist");
+
+        Post post = optionalPost.get();
 
         return getPostData(post, false);
     }
@@ -104,11 +111,17 @@ public class PostServiceImpl implements PostService {
     public String deletePostById(long id) {
         String email = userUtils.getEmail();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
+        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
+
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "post does not exist");
+
+        Post post = optionalPost.get();
 
         boolean isAdmin = userUtils.isAdmin(user.getRoles());
 

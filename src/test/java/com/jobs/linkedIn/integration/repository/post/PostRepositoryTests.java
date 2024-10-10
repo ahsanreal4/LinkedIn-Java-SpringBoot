@@ -1,4 +1,4 @@
-package com.jobs.linkedIn.repository.post;
+package com.jobs.linkedIn.integration.repository.post;
 
 import com.jobs.linkedIn.entities.post.Post;
 import com.jobs.linkedIn.entities.user.User;

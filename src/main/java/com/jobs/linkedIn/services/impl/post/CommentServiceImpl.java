@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -39,11 +40,17 @@ public class CommentServiceImpl implements CommentService {
     public PostCommentDto addPostComment(CreatePostCommentDto createPostCommentDto) {
         String email = userUtils.getEmail();
 
-        Post post = postRepository.findById(createPostCommentDto.getPostId())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "post does not exist"));
+        Optional<Post> optionalPost = postRepository.findById(createPostCommentDto.getPostId());
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "post does not exist");
+
+        Post post = optionalPost.get();
+
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
 
         PostComment postComment = new PostComment();
         postComment.setPostedAt(new Date());
@@ -54,8 +61,11 @@ public class CommentServiceImpl implements CommentService {
         Long parentId = createPostCommentDto.getParentId();
 
         if (parentId != null) {
-            PostComment parentComment = postCommentsRepository.findById(parentId)
-                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "parent comment does not exist"));
+            Optional<PostComment> optionalPostComment = postCommentsRepository.findById(parentId);
+
+            if (optionalPostComment.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "parent comment does not exist");
+
+            PostComment parentComment = optionalPostComment.get();
 
             postComment.setParent(parentComment);
         };
@@ -86,8 +96,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PostCommentDto getCommentById(long id) {
-        PostComment postComment = postCommentsRepository.findById(id)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "comment does not exist"));
+        Optional<PostComment> optionalPostComment = postCommentsRepository.findById(id);
+
+        if (optionalPostComment.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "comment does not exist");
+
+        PostComment postComment = optionalPostComment.get();
 
         return mapToDto(postComment);
     }
@@ -96,11 +109,17 @@ public class CommentServiceImpl implements CommentService {
     public String deleteCommentById(long id) {
         String email = userUtils.getEmail();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        PostComment postComment = postCommentsRepository.findById(id)
-                .orElseThrow(() -> new ApiException((HttpStatus.NOT_FOUND), "post comment does not exist"));
+        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
+
+        User user = optionalUser.get();
+
+        Optional<PostComment> optionalPostComment = postCommentsRepository.findById(id);
+
+        if(optionalPostComment.isEmpty()) throw new ApiException((HttpStatus.NOT_FOUND), "post comment does not exist");
+
+        PostComment postComment = optionalPostComment.get();
 
         boolean isAdmin = userUtils.isAdmin(user.getRoles());
 
