@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -110,8 +112,12 @@ public class UserServiceImpl implements UserService {
 
         User user = optionalUser.get();
 
-        List<User> friends = user.getFriends().stream().toList();
+        Set<User> friends = user.getFriends();
 
-        return friends.stream().map(friend -> modelMapper.map(friend, UserDto.class)).collect(Collectors.toList());
+        if (friends == null) return new ArrayList<>();
+
+        List<User> friendsList = friends.stream().toList();
+
+        return friendsList.stream().map(friend -> modelMapper.map(friend, UserDto.class)).collect(Collectors.toList());
     }
 }

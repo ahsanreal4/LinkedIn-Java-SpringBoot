@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -77,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<PostCommentDto> getPostComments(long id) {
-        Set<PostComment> comments = postCommentsRepository.findByPostIdAndParentId(id, null);
+        List<PostComment> comments = postCommentsRepository.findByPostIdAndParentId(id, null);
 
         return comments.stream().map(this::mapToDto).toList();
     }
@@ -89,7 +88,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<PostCommentDto> getReplyComments(long id) {
-        Set<PostComment> comments = postCommentsRepository.findByParentId(id);
+        List<PostComment> comments = postCommentsRepository.findByParentId(id);
 
         return comments.stream().map(this::mapToDto).toList();
     }
