@@ -4,7 +4,7 @@ import com.jobs.linkedIn.constants.UserRoles;
 import com.jobs.linkedIn.dto.user.UpdateUserDto;
 import com.jobs.linkedIn.dto.user.UserDto;
 import com.jobs.linkedIn.dto.user.UserProfileDto;
-import com.jobs.linkedIn.services.UserService;
+import com.jobs.linkedIn.services.interfaces.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

@@ -8,9 +8,9 @@ import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.post.CommentService;
-import com.jobs.linkedIn.services.post.PostLikeService;
-import com.jobs.linkedIn.services.post.PostService;
+import com.jobs.linkedIn.services.interfaces.post.CommentService;
+import com.jobs.linkedIn.services.interfaces.post.PostLikeService;
+import com.jobs.linkedIn.services.interfaces.post.PostService;
 import com.jobs.linkedIn.utils.UserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
+    private final String POST_DOES_NOT_EXIST = "post does not exist";
+    private final String CANNOT_DELeTE_OTHER_POST = "cannot delete someone else post";
+    private final String USER_DOES_NOT_EXIST = "user does not exist";
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -49,8 +52,6 @@ public class PostServiceImpl implements PostService {
         post.setPostedAt(new Date());
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
 
         User user = optionalUser.get();
 
@@ -93,7 +94,7 @@ public class PostServiceImpl implements PostService {
     public PostDto getPostById(long id) {
         Optional<Post> optionalPost = postRepository.findById(id);
 
-        if(optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "post does not exist");
+        if(optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, POST_DOES_NOT_EXIST);
 
         Post post = optionalPost.get();
 
@@ -113,19 +114,17 @@ public class PostServiceImpl implements PostService {
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
-
         User user = optionalUser.get();
 
         Optional<Post> optionalPost = postRepository.findById(id);
 
-        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "post does not exist");
+        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, POST_DOES_NOT_EXIST);
 
         Post post = optionalPost.get();
 
         boolean isAdmin = userUtils.isAdmin(user.getRoles());
 
-        if (!isAdmin && !post.getPostedBy().getId().equals(user.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, "you cannot delete someone else post");
+        if (!isAdmin && !post.getPostedBy().getId().equals(user.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, CANNOT_DELeTE_OTHER_POST);
 
         postRepository.delete(post);
 

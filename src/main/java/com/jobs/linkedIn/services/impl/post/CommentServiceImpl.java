@@ -9,7 +9,7 @@ import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostCommentsRepository;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.post.CommentService;
+import com.jobs.linkedIn.services.interfaces.post.CommentService;
 import com.jobs.linkedIn.utils.UserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,10 @@ import java.util.Optional;
 
 @Service
 public class CommentServiceImpl implements CommentService {
+    private final String POST_DOES_NOT_EXIST = "post does not exist";
+    private final String PARENT_COMMENT_DOES_NOT_EXIST = "parent comment does not exist";
+    private final String COMMENT_DOES_NOT_EXIST = "comment does not exist";
+    private final String CANNOT_DELETE_OTHERS_COMMENT = "Deleting others comment is not allowed";
 
     private final PostCommentsRepository postCommentsRepository;
     private final UserRepository userRepository;
@@ -41,13 +45,11 @@ public class CommentServiceImpl implements CommentService {
 
         Optional<Post> optionalPost = postRepository.findById(createPostCommentDto.getPostId());
 
-        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "post does not exist");
+        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, POST_DOES_NOT_EXIST);
 
         Post post = optionalPost.get();
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
 
         User user = optionalUser.get();
 
@@ -62,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
         if (parentId != null) {
             Optional<PostComment> optionalPostComment = postCommentsRepository.findById(parentId);
 
-            if (optionalPostComment.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "parent comment does not exist");
+            if (optionalPostComment.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, PARENT_COMMENT_DOES_NOT_EXIST);
 
             PostComment parentComment = optionalPostComment.get();
 
@@ -97,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
     public PostCommentDto getCommentById(long id) {
         Optional<PostComment> optionalPostComment = postCommentsRepository.findById(id);
 
-        if (optionalPostComment.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "comment does not exist");
+        if (optionalPostComment.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, COMMENT_DOES_NOT_EXIST);
 
         PostComment postComment = optionalPostComment.get();
 
@@ -110,19 +112,17 @@ public class CommentServiceImpl implements CommentService {
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
-
         User user = optionalUser.get();
 
         Optional<PostComment> optionalPostComment = postCommentsRepository.findById(id);
 
-        if(optionalPostComment.isEmpty()) throw new ApiException((HttpStatus.NOT_FOUND), "post comment does not exist");
+        if(optionalPostComment.isEmpty()) throw new ApiException((HttpStatus.NOT_FOUND), COMMENT_DOES_NOT_EXIST);
 
         PostComment postComment = optionalPostComment.get();
 
         boolean isAdmin = userUtils.isAdmin(user.getRoles());
 
-        if (!isAdmin && !postComment.getUser().getId().equals(user.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, "you cannot delete someone else comment");
+        if (!isAdmin && !postComment.getUser().getId().equals(user.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, CANNOT_DELETE_OTHERS_COMMENT);
 
         postCommentsRepository.delete(postComment);
 

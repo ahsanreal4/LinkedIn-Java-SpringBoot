@@ -164,21 +164,6 @@ public class UserServiceTest {
     }
 
     @Test
-    void SHOULD_NOT_RETURN_USER_PROFILE() {
-        User user = getNewUser();
-        String email = "ahsan.btph123@gmail.com";
-        UserProfileDto userProfileDto = new UserProfileDto();
-
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-        when(userUtils.getEmail()).thenReturn(email);
-        when(modelMapper.map(user, UserProfileDto.class)).thenReturn(userProfileDto);
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.userService.getProfile();
-        });
-    }
-
-    @Test
     void SHOULD_RETURN_USER_FRIENDS() {
         User user = getNewUser();
         String email = "ahsan.btph123@gmail.com";
@@ -197,25 +182,5 @@ public class UserServiceTest {
         List<UserDto> friendDtos = this.userService.getUserFriends();
 
         Assertions.assertEquals(2, friendDtos.size());
-    }
-
-    @Test
-    void SHOULD_NOT_RETURN_USER_FRIENDS() {
-        User user = getNewUser();
-        String email = "ahsan.btph123@gmail.com";
-
-        Set<User> friends = new HashSet<>();
-        friends.add(getNewUser());
-        friends.add(getNewUser());
-        user.setFriends(friends);
-        UserDto userDto = getUserDto(user);
-
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-        when(userUtils.getEmail()).thenReturn(email);
-        when(modelMapper.map(user, UserDto.class)).thenReturn(userDto);
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.userService.getUserFriends();
-        });
     }
 }

@@ -5,7 +5,7 @@ import com.jobs.linkedIn.dto.post.PostDto;
 import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.post.PostService;
+import com.jobs.linkedIn.services.interfaces.post.PostService;
 import com.jobs.linkedIn.utils.UserUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -83,17 +83,6 @@ public class PostServiceTest {
     }
 
     @Test
-    void SHOULD_NOT_REGSITER_POST_WHEN_USER_NOT_EXIST() {
-        CreatePostDto createPostDto = getNewCreatePostDto();
-
-        Mockito.when(userUtils.getEmail()).thenReturn("rafasfsafsa");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.postService.createPost(createPostDto);
-        });
-    }
-
-    @Test
     void SHOULD_RETURN_POST_BY_ID() {
         CreatePostDto createPostDto = getNewCreatePostDto();
 
@@ -137,15 +126,6 @@ public class PostServiceTest {
         PostDto postDto = this.postService.createPost(createPostDto);
 
         Assertions.assertInstanceOf(String.class, this.postService.deletePostById(postDto.getId()));
-    }
-
-    @Test
-    void SHOULD_NOT_DELETE_POST_BY_ID_WHEN_USER_NOT_EXIST() {
-        Mockito.when(userUtils.getEmail()).thenReturn("31r13r31");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.postService.deletePostById(9999L);
-        });
     }
 
     @Test

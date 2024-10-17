@@ -8,7 +8,7 @@ import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.user.RoleRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.AuthService;
+import com.jobs.linkedIn.services.interfaces.AuthService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

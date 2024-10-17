@@ -5,7 +5,7 @@ import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.post.PostLikeService;
+import com.jobs.linkedIn.services.interfaces.post.PostLikeService;
 import com.jobs.linkedIn.utils.UserUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -99,15 +99,6 @@ public class PostLikesServiceTest {
     }
 
     @Test
-    void SHOULD_NOT_LIKE_WHEN_USER_NOT_EXIST() {
-        Mockito.when(userUtils.getEmail()).thenReturn("something");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.postLikeService.likePost(post.getId());
-        });
-    }
-
-    @Test
     void SHOULD_NOT_LIKE_WHEN_POST_NOT_EXIST() {
         Mockito.when(userUtils.getEmail()).thenReturn(user.getEmail());
 
@@ -134,14 +125,5 @@ public class PostLikesServiceTest {
         Mockito.when(userUtils.getEmail()).thenReturn(user.getEmail());
         this.postLikeService.likePost(post.getId());
         Assertions.assertFalse(this.postLikeService.isLikedByUser(post.getId()));
-    }
-
-    @Test
-    void SHOULD_NOT_RETURN_IS_LIKED_WHEN_USER_NOT_EXIST() {
-        Mockito.when(userUtils.getEmail()).thenReturn("dagsadgda");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.postLikeService.isLikedByUser(post.getId());
-        });
     }
 }

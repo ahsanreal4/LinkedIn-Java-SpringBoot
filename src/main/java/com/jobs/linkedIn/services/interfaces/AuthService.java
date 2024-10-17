@@ -1,4 +1,4 @@
-package com.jobs.linkedIn.services;
+package com.jobs.linkedIn.services.interfaces;
 
 import com.jobs.linkedIn.dto.auth.RegisterUserDto;
 import com.jobs.linkedIn.dto.user.UserDto;

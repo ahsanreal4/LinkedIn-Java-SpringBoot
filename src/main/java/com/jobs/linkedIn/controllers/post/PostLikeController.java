@@ -1,10 +1,9 @@
 package com.jobs.linkedIn.controllers.post;
 
 import com.jobs.linkedIn.dto.post.likes.CreateLikeDto;
-import com.jobs.linkedIn.services.post.PostLikeService;
+import com.jobs.linkedIn.services.interfaces.post.PostLikeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

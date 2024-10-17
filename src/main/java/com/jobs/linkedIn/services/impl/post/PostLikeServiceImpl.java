@@ -8,7 +8,7 @@ import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostLikesRepository;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.post.PostLikeService;
+import com.jobs.linkedIn.services.interfaces.post.PostLikeService;
 import com.jobs.linkedIn.utils.UserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,7 @@ import java.util.Optional;
 
 @Service
 public class PostLikeServiceImpl implements PostLikeService {
+    private final String POST_DOES_NOT_EXIST = "post does not exist";
 
     private final PostLikesRepository postLikesRepository;
     private final PostRepository postRepository;
@@ -39,13 +40,11 @@ public class PostLikeServiceImpl implements PostLikeService {
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        if (optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
-
         User user = optionalUser.get();
 
         Optional<Post> optionalPost = postRepository.findById(postId);
 
-        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "post does not exist");
+        if (optionalPost.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, POST_DOES_NOT_EXIST);
 
         Post post = optionalPost.get();
 
@@ -80,8 +79,6 @@ public class PostLikeServiceImpl implements PostLikeService {
         String email = userUtils.getEmail();
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if(optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
 
         User user = optionalUser.get();
 

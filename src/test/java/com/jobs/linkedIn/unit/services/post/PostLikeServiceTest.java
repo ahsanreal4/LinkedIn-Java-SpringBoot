@@ -104,18 +104,4 @@ public class PostLikeServiceTest {
 
         Assertions.assertInstanceOf(Boolean.class, this.postLikeService.isLikedByUser(post.getId()));
     }
-
-    @Test
-    void SHOULD_NOT_RETURN_IS_LIKED_BY_USER() {
-        User user = getNewUser();
-        Post post = getNewPost(user);
-
-        Mockito.when(userUtils.getEmail()).thenReturn(user.getEmail());
-        Mockito.when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-        Mockito.when(postLikesRepository.existsByUserIdAndPostId(user.getId(),post.getId())).thenReturn(true);
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.postLikeService.isLikedByUser(post.getId());
-        });
-    }
 }

@@ -5,7 +5,7 @@ import com.jobs.linkedIn.dto.user.UserDto;
 import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.UserService;
+import com.jobs.linkedIn.services.interfaces.UserService;
 import com.jobs.linkedIn.utils.UserUtils;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
@@ -110,32 +110,10 @@ public class UserServiceTest {
     }
 
     @Test
-    void SHOULD_NOT_UPDATE_USER() {
-        Mockito.when(userUtils.getEmail()).thenReturn("randomdummy");
-
-        UpdateUserDto updateUserDto = new UpdateUserDto();
-        updateUserDto.setFirstName("dummy");
-        updateUserDto.setLastName("random");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            userService.updateUser(updateUserDto);
-        });
-    }
-
-    @Test
     void SHOULD_RETURN_USER_PROFILE() {
         Mockito.when(userUtils.getEmail()).thenReturn(user.getEmail());
 
         userService.getProfile();
-    }
-
-    @Test
-    void SHOULD_NOT_RETURN_USER_PROFILE() {
-        Mockito.when(userUtils.getEmail()).thenReturn("RANDOM@gmail.com");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            userService.getProfile();
-        });
     }
 
     @Test
@@ -146,14 +124,5 @@ public class UserServiceTest {
         List<UserDto> friends = this.userService.getUserFriends();
 
         Assertions.assertEquals(0, friends.size());
-    }
-
-    @Test
-    void SHOULD_NOT_RETURN_USER_FRIENDS() {
-        Mockito.when(userUtils.getEmail()).thenReturn("RANDOM@gmail.com");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            userService.getUserFriends();
-        });
     }
 }

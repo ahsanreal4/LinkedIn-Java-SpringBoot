@@ -2,7 +2,7 @@ package com.jobs.linkedIn.controllers.post;
 
 import com.jobs.linkedIn.dto.post.CreatePostDto;
 import com.jobs.linkedIn.dto.post.PostDto;
-import com.jobs.linkedIn.services.post.PostService;
+import com.jobs.linkedIn.services.interfaces.post.PostService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

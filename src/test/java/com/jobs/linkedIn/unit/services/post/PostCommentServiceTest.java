@@ -103,23 +103,6 @@ public class PostCommentServiceTest {
     }
 
     @Test
-    void SHOULD_NOT_SAVE_POST_COMMENT_WHEN_USER_NOT_FOUND() {
-        User user = getNewUser();
-        Post post = getNewPost(user);
-        CreatePostCommentDto createPostCommentDto = new CreatePostCommentDto();
-        createPostCommentDto.setPostId(post.getId());
-        createPostCommentDto.setText("Some text");
-
-        Mockito.when(userUtils.getEmail()).thenReturn(user.getEmail());
-        Mockito.when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
-        Mockito.when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.commentService.addPostComment(createPostCommentDto);
-        });
-    }
-
-    @Test
     void SHOULD_NOT_SAVE_POST_COMMENT_WHEN_POST_NOT_FOUND() {
         User user = getNewUser();
         Post post = getNewPost(user);
@@ -193,23 +176,6 @@ public class PostCommentServiceTest {
         Mockito.when(postCommentsRepository.findById(postComment.getId())).thenReturn(Optional.of(postComment));
 
         Assertions.assertInstanceOf(String.class, this.commentService.deleteCommentById(postComment.getId()));
-    }
-
-    @Test
-    void SHOULD_NOT_DELETE_COMMENT_WHEN_USER_NOT_FOUND() {
-        User user = getNewUser();
-        Post post = getNewPost(user);
-        PostComment postComment = getNewPostComment(post);
-
-        Mockito.when(userUtils.getEmail()).thenReturn(user.getEmail());
-        Mockito.when(userUtils.isAdmin(user.getRoles())).thenReturn(false);
-
-        Mockito.when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-        Mockito.when(postCommentsRepository.findById(postComment.getId())).thenReturn(Optional.of(postComment));
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.commentService.deleteCommentById(postComment.getId());
-        });
     }
 
     @Test

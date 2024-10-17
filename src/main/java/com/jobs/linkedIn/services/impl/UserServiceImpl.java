@@ -4,9 +4,10 @@ import com.jobs.linkedIn.dto.user.UpdateUserDto;
 import com.jobs.linkedIn.dto.user.UserDto;
 import com.jobs.linkedIn.dto.user.UserProfileDto;
 import com.jobs.linkedIn.entities.user.User;
+import com.jobs.linkedIn.entities.user.UserInfo;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.UserService;
+import com.jobs.linkedIn.services.interfaces.UserService;
 import com.jobs.linkedIn.utils.UserUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private final String USER_NAME_ALREADY_EXISTS = "username already exists";
+    private final String USER_DOES_NOT_EXIST = "user does not exist";
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
@@ -45,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String deleteUser(long id) {
         User user = userRepository.findById(id).orElseThrow(
-                () -> new ApiException(HttpStatus.NOT_FOUND, "user does not exist with id " + id)
+                () -> new ApiException(HttpStatus.NOT_FOUND, USER_DOES_NOT_EXIST)
         );
 
         userRepository.delete(user);
@@ -58,14 +61,12 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        if (optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
-
         User user = optionalUser.get();
 
         if (updateUserDto.getUsername() != null && !updateUserDto.getUsername().equals(user.getUsername())) {
             String username = updateUserDto.getUsername();
 
-            if(userRepository.findByUsername(username).isPresent()) throw new ApiException(HttpStatus.BAD_REQUEST, "user already exists with this username");
+            if(userRepository.findByUsername(username).isPresent()) throw new ApiException(HttpStatus.BAD_REQUEST, USER_NAME_ALREADY_EXISTS);
 
             user.setUsername(username);
         }
@@ -92,12 +93,11 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        if (optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
-
         User user = optionalUser.get();
 
         UserProfileDto userProfileDto = modelMapper.map(user, UserProfileDto.class);
-        if(user.getUserInfo() != null) modelMapper.map(user.getUserInfo(), userProfileDto);
+        UserInfo userInfo = user.getUserInfo();
+        if(userInfo != null) modelMapper.map(userInfo, userProfileDto);
 
         return userProfileDto;
     }
@@ -107,8 +107,6 @@ public class UserServiceImpl implements UserService {
         String email = userUtils.getEmail();
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "user does not exist");
 
         User user = optionalUser.get();
 

@@ -1,4 +1,4 @@
-package com.jobs.linkedIn.services.post;
+package com.jobs.linkedIn.services.interfaces.post;
 
 import com.jobs.linkedIn.dto.post.comment.CreatePostCommentDto;
 import com.jobs.linkedIn.dto.post.comment.PostCommentDto;

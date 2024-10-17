@@ -3,7 +3,7 @@ package com.jobs.linkedIn.controllers;
 import com.jobs.linkedIn.dto.auth.RegisterUserDto;
 import com.jobs.linkedIn.dto.user.UserDto;
 import com.jobs.linkedIn.dto.auth.LoginUserDto;
-import com.jobs.linkedIn.services.AuthService;
+import com.jobs.linkedIn.services.interfaces.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

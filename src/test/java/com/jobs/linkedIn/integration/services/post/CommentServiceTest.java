@@ -7,7 +7,7 @@ import com.jobs.linkedIn.entities.user.User;
 import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
-import com.jobs.linkedIn.services.post.CommentService;
+import com.jobs.linkedIn.services.interfaces.post.CommentService;
 import com.jobs.linkedIn.utils.UserUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -125,17 +125,6 @@ public class CommentServiceTest {
     }
 
     @Test
-    void SHOULD_NOT_ADD_COMMENT_WHEN_USER_NOT_EXIST() {
-        CreatePostCommentDto createPostCommentDto = getCreatePostCommentDto(post.getId());
-
-        Mockito.when(userUtils.getEmail()).thenReturn("fsafsafsa");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.commentService.addPostComment(createPostCommentDto);
-        });
-    }
-
-    @Test
     void SHOULD_NOT_ADD_COMMENT_WHEN_PARENT_COMMENT_NOT_EXIST() {
         CreatePostCommentDto createPostCommentDto = getCreatePostCommentDto(post.getId());
 
@@ -208,20 +197,6 @@ public class CommentServiceTest {
         PostCommentDto postCommentDto = this.commentService.addPostComment(createPostCommentDto);
 
         Assertions.assertInstanceOf(String.class, this.commentService.deleteCommentById(postCommentDto.getId()));
-    }
-
-    @Test
-    void SHOULD_NOT_DELETE_COMMENT_WHEN_USER_NOT_EXIST() {
-        CreatePostCommentDto createPostCommentDto = getCreatePostCommentDto(post.getId());
-
-        Mockito.when(userUtils.isAdmin(user.getRoles())).thenReturn(false);
-        Mockito.when(userUtils.getEmail()).thenReturn(user.getEmail());
-        PostCommentDto postCommentDto = this.commentService.addPostComment(createPostCommentDto);
-        Mockito.when(userUtils.getEmail()).thenReturn("fasfsafsa");
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.commentService.deleteCommentById(postCommentDto.getId());
-        });
     }
 
     @Test

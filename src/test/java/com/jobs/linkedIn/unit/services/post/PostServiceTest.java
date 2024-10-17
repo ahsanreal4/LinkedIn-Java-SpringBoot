@@ -9,8 +9,8 @@ import com.jobs.linkedIn.exception.ApiException;
 import com.jobs.linkedIn.repositories.post.PostRepository;
 import com.jobs.linkedIn.repositories.user.UserRepository;
 import com.jobs.linkedIn.services.impl.post.PostServiceImpl;
-import com.jobs.linkedIn.services.post.CommentService;
-import com.jobs.linkedIn.services.post.PostLikeService;
+import com.jobs.linkedIn.services.interfaces.post.CommentService;
+import com.jobs.linkedIn.services.interfaces.post.PostLikeService;
 import com.jobs.linkedIn.utils.UserUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -119,24 +119,6 @@ public class PostServiceTest {
 
         Assertions.assertNotSame(null, this.postService.createPost(createPostDto));
         Assertions.assertNotSame(null, this.postService.createPost(createPostDto1));
-    }
-
-    @Test
-    void SHOULD_NOT_SAVE_WHEN_USER_NOT_FOUND() {
-        User user = getNewUser();
-        Post post = getNewPost();
-        post.setPostedBy(user);
-        CreatePostDto createPostDto = getNewCreatePostDto(post);
-        CreatePostDto createPostDto1 = getNewCreatePostDto(post);
-        createPostDto1.setTitle("changed");
-
-        Mockito.when(userUtils.getEmail()).thenReturn(user.getEmail());
-        Mockito.when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-        Mockito.when(postRepository.save(Mockito.any(Post.class))).thenReturn(post);
-
-        Assertions.assertThrows(ApiException.class, () -> {
-            this.postService.createPost(createPostDto);
-        });
     }
 
     @Test
